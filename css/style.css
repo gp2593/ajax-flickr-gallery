@@ -1,0 +1,70 @@
+#afg-set-list {
+	position: relative;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+#afg-set-list .afg-set img {
+	width: 100%;
+	box-shadow: none;
+	border-radius: 0;
+}
+#afg-set-list .afg-set span {
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+	height: 200px;
+	width: 320px;
+	line-height: 0;
+}
+
+#afg-set-list .afg-set {
+	position: relative;
+	float: left;
+	width: 320px;
+	height: 200px;
+	overflow: hidden;
+	background-color: #000;
+	box-shadow: 1px 1px 5px #CCC;
+	margin: 8px;
+}
+
+#afg-set-list .afg-info h4 {
+	font-size: 16px;
+	font-size: 1.14285714286rem;
+	height: 30px;
+	width: 100%;
+	overflow: hidden;
+	margin: 0;
+
+}
+
+#afg-set-list .afg-info .afg-meta {
+	font-size: 14px;
+	font-size: 1rem;
+	height: 22px;
+	width: 100%;
+	overflow: hidden;
+	border-bottom: 1px solid #fff;
+}
+#afg-set-list .afg-info .afg-desc {
+	height: 70px;
+	border-top: 1px solid #555;
+}
+
+#afg-set-list .afg-info {
+	padding: 0 5%;
+	position: absolute;
+	top: 148px;
+	color: #eee;
+	text-shadow: 0 0 3px #000;
+	height: 124px;
+	width: 90%;
+	background-image: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+	transition: all 0.3s ease-in-out;
+}
+
+#afg-set-list .afg-info:hover {
+	top: 76px;
+}
