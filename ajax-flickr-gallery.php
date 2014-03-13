@@ -45,38 +45,125 @@ class PhpFlickrCreator {
 class AjaxFlickrGallery {
 	public $input = "abc";
 
+	private $_the_set = NULL;
+
 	public function plugin_init() {
 		wp_enqueue_style("afg-style", plugin_dir_url(__FILE__) . "css/style.css", true, "0.1");
+		wp_enqueue_script("afg-script", plugin_dir_url(__FILE__) . "js/main.js", array('jquery'), "0.1");
+		wp_localize_script('afg-script', 'afg_ajax_url', admin_url('admin-ajax.php'));
+	}
+
+	public function get_photo() {
+		$id = $_POST['id'];
+		if (!$id)
+			die();
+
+		$pf = PhpFlickrCreator::get_php_flickr();
+		die();
+
+	}
+	
+	public function process_the_title($title) {
+		$set_id = get_query_var('sid');
+		if ($set_id == "")
+			return $title;
+		$pf = PhpFlickrCreator::get_php_flickr();
+		if ($this -> _the_set === NULL) {
+			$err = $pf -> photosets_getPhotos($set_id, 'url_z,o_dims,data_taken');
+			$this -> _the_set = $err;
+		}
+		if ($title == 'Photo Set')
+			$title = $this -> _the_set['photoset']['title'];
+		return $title;
+	}
+	public function process_wp_title($title, $sep) {
+		$set_id = get_query_var('sid');
+		if ($set_id == "")
+			return $title;
+		$pf = PhpFlickrCreator::get_php_flickr();
+		if ($this -> _the_set === NULL) {
+			$err = $pf -> photosets_getPhotos($set_id, 'url_z,o_dims,data_taken');
+			$this -> _the_set = $err;
+		}
+		$title = $this -> _the_set['photoset']['title'] . ' ' . $sep . ' ' . $title;
+		return $title;
+	}
+
+	public function list_photos($attr) {
+		return $this -> _list_photos_process($attr);
+	}
+
+	private function _list_photos_process($attr = NULL) {
+		$set_id = get_query_var('sid');
+		if ($set_id == "")
+			return $this -> _err_msg(NULL, "no valid set id provided!");
+		$pf = PhpFlickrCreator::get_php_flickr();
+		if ($this -> _the_set === NULL)
+			$err = $pf -> photosets_getPhotos($set_id, 'url_z,o_dims,data_taken');
+		else
+			$err = $this -> _the_set;
+		if ($err === false) {
+			return $this -> _err_msg($pf);
+		}
+		$ret = $this -> _render_photo_set($err['photoset']);
+		return $ret;
 	}
 
 	public function list_sets($attr) {
+		return $this -> _list_sets_process($attr);
+	}
+	private function _list_sets_process($attr = NULL) {
 		$pf = PhpFlickrCreator::get_php_flickr();
 		$err = $pf -> photosets_getList(FLICKR_USERID);
 		if ($err === false) {
+			return $this -> _err_msg($pf);
+		}
+		$res = $err;
+		$sets = array();
+		foreach($res['photoset'] as $set) {
+			$err = $pf -> photosets_getPhotos($set['id'], 'url_z,o_dims,date_taken', NULL, 2, 0);
+			if ($err === false) 
+				return $this -> _err_msg($pf);
+			$set['first_two'] = $err;
+			// need change to conf
+			$tmp = "http://localhost:8080/photo-set/";
+			$set['photo_set_url'] = add_query_arg('sid', $set['id'], $tmp);
+			$sets[] = $set;
+		}
+		$ret = $this -> _render_set_list($sets);
+		return $ret;
+	}
+	private function _err_msg($pf, $msg = NULL) {
+		if ($msg === NULL) {
 			$ret = "<b>Flickr API error: (";
 			$ret .= $pf -> getErrorCode();
 			$ret .= ") ";
 			$ret .= $pf-> getErrorMsg();
 			$ret .= "</b>";
-			return $ret;
+		} else {
+			$ret = "<b>Error: $msg</b>";
 		}
-		$ret = $this -> _render_set_list($err['photoset']);
-
 		return $ret;
-	}
-
-	public function show_set($attr) {
-		return " ";
 	}
 
 	private function _get_set_primary_url($set) {
 		return $this->_get_photo_url($set['farm'], $set['server'], $set['primary'],
-			$set['secret']);
+			$set['secret'], 'z');
 	}
 
-	private function _get_photo_url($farm_id, $server_id, $id, $secret) {
+	private function _get_photo_big_url($photo) {
+		return $this->_get_photo_url($photo['farm'], $photo['server'],
+			$photo['id'], $photo['secret'], 'b');
+	}
+
+	private function _get_photo_url($farm_id, $server_id, $id, $secret, $size) {
 		return "http://farm{$farm_id}.staticflickr.com/{$server_id}/{$id}"
-			. "_{$secret}_z.jpg";
+			. "_{$secret}_$size.jpg";
+	}
+
+	private function _render_photo_set($photos) {
+		$this->input = $photos;
+		return $this->_render("photo_set");
 	}
 
 	private function _render_set_list($sets) {
@@ -101,5 +188,17 @@ class AjaxFlickrGallery {
 }
 $afg = new AjaxFlickrGallery();
 add_shortcode("afg_list_sets", array($afg, "list_sets"));
+add_shortcode("afg_list_photos", array($afg, "list_photos"));
 
 add_action('wp_enqueue_scripts', array($afg, "plugin_init"));
+
+function add_query_vars_filter($vars){
+	  $vars[] = "sid";
+	    return $vars;
+}
+add_filter( 'query_vars', 'add_query_vars_filter' );
+add_filter( 'wp_title', array($afg, "process_wp_title"), 10, 2 );
+add_filter( 'the_title', array($afg, "process_the_title"), 10, 1 );
+
+add_action('wp_ajax_afg_get_photo', array($afg, 'get_photo'));
+add_action('wp_ajax_nopriv_afg_get_photo', array($afg, 'get_photo'));

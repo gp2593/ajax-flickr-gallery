@@ -5,10 +5,28 @@
 	margin: 0;
 }
 
+#afg-photo-set img {
+	margin: 0;
+	padding: 0;
+	cursor: pointer;
+}
 #afg-set-list .afg-set img {
 	width: 100%;
 	box-shadow: none;
 	border-radius: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	transition: all 0.3s ease-in-out;
+}
+#afg-set-list .afg-set img:hover {
+	opacity: 0;
+}
+#afg-photo-set .afg-line span {
+	line-height: 0;
+}
+#afg-photo-set .afg-line {
+	margin-bottom: 5px;
 }
 #afg-set-list .afg-set span {
 	display: table-cell;
@@ -67,4 +85,85 @@
 
 #afg-set-list .afg-info:hover {
 	top: 76px;
+}
+
+#afg-photo-detail {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.9);
+	z-index: 999;
+	display: none;
+}
+#afg-photo-big {
+	position: relative;
+	width: 80%;
+	height: 100%;
+	float: left;
+}
+#afg-photo-info {
+	position: relative;
+	width: 20%;
+	height: 100%;
+	float: left;
+	background-color: rgba(0, 0, 0, 0.5);
+	padding-top: 30px;
+}
+#afg-photo-container-wrapper {
+	position: relative;
+	left: -100%;
+	width: 400%;
+	height: 100%;
+}
+
+.afg-photo-container {
+	position: relative;
+	display: table;
+	float: left;
+	height: 100%;
+	width: 25%;
+}
+.afg-photo-class {
+	position: relative;
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+	height: 100%;
+	width: 100%;
+	line-height: 0;
+}
+#afg-photo-container img{
+	max-height: 100%;
+	max-width: 100%;
+}
+#afg-photo-detail-close {
+	float: right;
+	width: 30px;
+	margin: 10px;
+}
+#afg-photo-detail .afg-photo-loading {
+	display: none;
+	position: absolute;
+	left: 48%;
+	top: 48%;
+	width: 40px;
+	height: 40px;
+}
+#afg-photo-next {
+	position: absolute;
+	display: none;
+	left: 50%;
+	top: 0;
+	width: 50%;
+	height: 100%;
+}
+#afg-photo-prev {
+	position: absolute;
+	display: none;
+	left: 0;
+	top: 0;
+	width: 50%;
+	height: 100%;
 }

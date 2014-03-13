@@ -73,8 +73,24 @@ if (count($cur['photos']) > 0) {
 <?php foreach ($lines as &$line) : ?>
 <div class="afg-line" style="width:<?= $width ?>px; height:<?= floor($line['height']) ?>px">
 	<?php foreach($line['photos'] as &$photo) :
-	?><span class="afg-photo"><img style="height:<?= floor($line['height']) ?>px; margin-right: <?= $photo['margin_z'] ?>px" src="<?= $photo['url_z'] ?>" /></span><?php
+	?><span class="afg-photo"><img style="height:<?= floor($line['height']) ?>px; margin-right: <?= $photo['margin_z'] ?>px" src="<?= $photo['url_z'] ?>" id="<?= $photo['id'] ?>" alt="<?= $this->_get_photo_big_url($photo) ?>"/></span><?php
 	endforeach; ?>
 </div>
 <?php endforeach; ?>
+</div>
+<div id="afg-photo-detail">
+	<div id="afg-photo-big">
+		<div id="afg-photo-container-wrapper">
+			<div class="afg-photo-container"><div id="afg-photo-p" class="afg-photo-class" ></div></div>
+			<div class="afg-photo-container"><div id="afg-photo-c" class="afg-photo-class" ></div></div>
+			<div class="afg-photo-container"><div id="afg-photo-n" class="afg-photo-class" ></div></div>
+		</div>
+		<div class="afg-photo-loading"><img src="<?= plugin_dir_url(__FILE__) . "loading.gif" ?>" /></div>
+		<div id="afg-photo-prev"></div>
+		<div id="afg-photo-next"></div>
+	</div>
+	<div id="afg-photo-info">
+		<div id="afg-photo-detail-close"><img src="<?= plugin_dir_url(__FILE__) . "close.png" ?>" /></div>
+		<div clsss="dummy"></div>
+	</div>
 </div>
