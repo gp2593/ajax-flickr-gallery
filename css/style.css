@@ -1,3 +1,34 @@
+#afg-photo-set div,
+#afg-photo-set h1,
+#afg-photo-set h2,
+#afg-photo-set h3,
+#afg-photo-set h4,
+#afg-photo-set h5,
+#afg-photo-set h6,
+#afg-photo-set p,
+#afg-photo-set header,
+#afg-photo-set img,
+#afg-photo-set span,
+#afg-photo-set a,
+#afg-set-list div,
+#afg-set-list h1,
+#afg-set-list h2,
+#afg-set-list h3,
+#afg-set-list h4,
+#afg-set-list h5,
+#afg-set-list h6,
+#afg-set-list p,
+#afg-set-list header,
+#afg-set-list img,
+#afg-set-list span,
+#afg-set-list a {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+}
+
 #afg-set-list {
 	position: relative;
 	width: 100%;
@@ -166,4 +197,25 @@
 	top: 0;
 	width: 50%;
 	height: 100%;
+}
+
+.afg-photo-info-box {
+	position: relative;
+	width: 100%;
+	padding: 15px;
+	color: #eee;
+}
+
+#afg-photo-info-meta header > div {
+	margin-top: 20px;
+}
+
+#afg-photo-info-meta header > div span{
+	font-size: 14px;
+	margin-right: 10px;
+}
+#afg-photo-info-meta header img {
+	vertical-align: text-bottom;
+	margin-right: 5px;
+	height: 20px;
 }

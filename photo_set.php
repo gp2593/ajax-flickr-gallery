@@ -91,6 +91,10 @@ if (count($cur['photos']) > 0) {
 	</div>
 	<div id="afg-photo-info">
 		<div id="afg-photo-detail-close"><img src="<?= plugin_dir_url(__FILE__) . "close.png" ?>" /></div>
-		<div clsss="dummy"></div>
+		<div class="dummy" ></div>
+		<div id="afg-photo-info-user" class="afg-photo-info-box" ></div>
+		<div id="afg-photo-info-errmsg" class="afg-photo-info-box"></div>
+		<div id="afg-photo-info-meta" class="afg-photo-info-box" ></div>
+		<div id="afg-photo-info-exif" class="afg-photo-info-box" ></div>
 	</div>
 </div>

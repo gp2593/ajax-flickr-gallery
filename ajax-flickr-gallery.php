@@ -51,16 +51,38 @@ class AjaxFlickrGallery {
 		wp_enqueue_style("afg-style", plugin_dir_url(__FILE__) . "css/style.css", true, "0.1");
 		wp_enqueue_script("afg-script", plugin_dir_url(__FILE__) . "js/main.js", array('jquery'), "0.1");
 		wp_localize_script('afg-script', 'afg_ajax_url', admin_url('admin-ajax.php'));
+		wp_localize_script('afg-script', 'afg_img_base', plugin_dir_url(__FILE__));
 	}
 
 	public function get_photo() {
+		$ret = array('errno' => 500, 'data' => 'Null');
 		$id = $_POST['id'];
 		if (!$id)
 			die();
 
 		$pf = PhpFlickrCreator::get_php_flickr();
-		die();
+		$err = $pf -> photos_getInfo($id);
+		if ($err === false) {
+			$ret['errno'] = 1;
+			$ret['data'] = $this -> _err_msg($pf);
+			echo json_encode($ret);
+			die();
+		}
+		
+		$ret['data'] = array();
+		$ret['data']['meta'] = $err;
 
+		$err = $pf -> photos_getExif($id);
+		if ($err === false) {
+			$ret['errno'] = 1;
+			$ret['data'] = $this -> _err_msg($fp);
+			echo json_encode($ret);
+			die();
+		}
+		$ret['errno'] = 0;
+		$ret['data']['exif'] = $err;
+		echo json_encode($ret);
+		die();
 	}
 	
 	public function process_the_title($title) {
@@ -144,6 +166,16 @@ class AjaxFlickrGallery {
 			$ret = "<b>Error: $msg</b>";
 		}
 		return $ret;
+	}
+
+	private function _get_user_info() {
+		$pf = PhpFlickrCreator::get_php_flickr();
+		$err = $pf -> people_getInfo(FLICKR_USERID);
+		if ($err === false) {
+			return false;
+		}
+
+		return $err;
 	}
 
 	private function _get_set_primary_url($set) {

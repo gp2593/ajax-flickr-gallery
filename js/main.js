@@ -32,6 +32,7 @@ jQuery(document).ready(function() {
 		small_src = source.attr('src');
 		big_src = source.attr('alt');
 		pic_id = source.attr('id');
+		get_photo_info(pic_id);
 
 		var img = new Image();
 		$(img).attr('src', small_src).appendTo($('#afg-photo-p'));
@@ -55,6 +56,7 @@ jQuery(document).ready(function() {
 		small_src = source.attr('src');
 		big_src = source.attr('alt');
 		pic_id = source.attr('id');
+		get_photo_info(pic_id);
 
 		var img = new Image();
 		$(img).attr('src', small_src).appendTo($('#afg-photo-n'));
@@ -70,6 +72,7 @@ jQuery(document).ready(function() {
 	}
 	function replace_img(original) {
 		cur = original;
+		get_photo_info($(original).attr('id'));
 		var img = new Image();
 		$('#afg-photo-c').html('');
 		$(img).attr('src', $(original).attr('src')).appendTo($('#afg-photo-c'));
@@ -79,12 +82,6 @@ jQuery(document).ready(function() {
 		$('#afg-photo-prev').css('display', 'block');
 		$('#afg-photo-next').css('display', 'block');
 
-		var data = {
-			action: 'afg_get_photo',
-			id: $(original).attr('id')
-		};
-		$.post(afg_ajax_url, data, function(res) {
-		});
 	}
 	function load_big(original, to_replace) {
 		var big_img = new Image();
@@ -117,6 +114,105 @@ jQuery(document).ready(function() {
 			});
 		});
 		$(big_img).attr('src', $(original).attr('alt'));
+	}
+	function fatal_error(msg) {
+		$('#afg-photo-info-errmsg').html('unexpected error: ' + msg).fadeIn();
+	}
+	function ajax_check(res) {
+		if (typeof res['data'] != 'object')
+			return false;
+
+		if (typeof res['data']['meta'] != 'object')
+			return false;
+		if (typeof res['data']['meta']['photo'] != 'object')
+			return false;
+		if (typeof res['data']['meta']['photo']['id'] == 'undefined')
+			return false;
+
+		if (typeof res['data']['exif'] != 'object')
+			return false;
+
+		return true;
+	}
+	function clear_photo_info_loading() {
+		$('#afg-photo-info-errmsg').html('Loading...').fadeIn();
+		$('#afg-photo-info-meta').html('');
+		$('#afg-photo-info-user').html('');
+		$('#afg-photo-info-exif').html('');
+	}
+	function get_photo_info(id) {
+		clear_photo_info_loading();
+		var data = {
+			action: 'afg_get_photo',
+			id: id
+		};
+		$.post(afg_ajax_url, data, function(res) {
+			if (res['errno'] != 0) {
+				if (typeof res['data'] == 'string')
+					fatal_error(res['data']);
+				else
+					fatal_error('wild return data');
+			} else if (!ajax_check(res)) {
+				fatal_error('wild return data');
+			} else {
+				if (res['data']['meta']['photo']['id'] != $(cur).attr('id'))
+					return;
+				$('#afg-photo-info-errmsg').html('').hide();
+				put_meta_info(res['data']['meta']['photo']);
+				put_exif_info(res['data']['exif']);
+			}
+		}, 'json').fail(function() {
+			$('#afg-photo-info-errmsg').html('server error');
+		});
+	}
+	function put_exif_info(exif) {
+		ret = "<div>";
+		for (i = 0; i < exif['exif'].length; i ++) {
+			if (typeof exif['exif'][i]['tag'] == 'string') {
+				if (exif['exif'][i]['tag'] == 'Make') {
+					ret += "Make: " + exif['exif'][i]['raw'] + "<br />";
+				} else if (exif['exif'][i]['tag'] == 'Model') {
+					ret += "Model: " + exif['exif'][i]['raw'] + "<br />";
+				} else if (exif['exif'][i]['tag'] == 'Software') {
+					ret += "Software: " + exif['exif'][i]['raw'] + "<br />";
+				} else if (exif['exif'][i]['tag'] == 'ExposureTime') {
+					ret += "Exposure: " + exif['exif'][i]['raw'] + "<br />";
+				} else if (exif['exif'][i]['tag'] == 'FNumber') {
+					ret += "Aperture: " + exif['exif'][i]['raw'] + "<br />";
+				} else if (exif['exif'][i]['tag'] == 'ExposureProgram'){
+					ret += "Exposure Program: " + exif['exif'][i]['raw'] + "<br />";
+				} else if (exif['exif'][i]['tag'] == 'ISO') {
+					ret += "ISO: " + exif['exif'][i]['raw'] + "<br />";
+				}
+			}
+		}
+		ret += "</div>";
+		$('#afg-photo-info-exif').html(ret);
+	}
+	function put_meta_info(meta) {
+		ret = "<header>";
+		if (typeof meta['title'] == 'string')
+			ret += "<h2>" + meta['title'] + "</h2>";
+		else
+			ret += "<h2>" + "No Title" + "</h2>";
+		if (typeof meta['description'] == 'string' && meta['description'] != '')
+			ret += "<p>" + meta['title'] + "</p>";
+
+		ret += "<div>";
+		if (typeof meta['views'] == 'string') {
+			ret += "<span><img src=\"" + afg_img_base + "eye_icon.png\" />";
+			ret += meta['views'] + "</span>";
+		}
+		if (typeof meta['dates'] == 'object' &&
+				typeof meta['dates']['taken'] == 'string') {
+			ret += "<span><img src=\"" + afg_img_base + "calendar_1_icon.png\" />";
+			d = new Date(meta['dates']['taken']);
+			ret += d.getFullYear() + '-' + (1 + d.getMonth()) + '-'
+				+ d.getDate() + "</span>";
+		}
+		ret += "</div>";
+		ret += "</header>";
+		$('#afg-photo-info-meta').html(ret);
 	}
 	$('.afg-photo img').click(function(e) {
 		ori = this;
