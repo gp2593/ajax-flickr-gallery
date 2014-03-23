@@ -64,8 +64,11 @@ foreach ($lines as &$line) {
 	$line['photos'][$num]['margin_z'] = 0;
 }
 if (count($cur['photos']) > 0) {
-	foreach($cur['photos'] as &$photo)
+	foreach($cur['photos'] as &$photo) {
+		$photo['width_z'] = round($photo['width_z'] * $cur['height'] / $photo['height_z']);
+		$photo['height_z'] = $cur['height'];
 		$photo['margin_z'] = 5;
+	}
 	$lines[] = $cur;
 }
 ?>
@@ -73,7 +76,7 @@ if (count($cur['photos']) > 0) {
 <?php foreach ($lines as &$line) : ?>
 <div class="afg-line" style="width:<?= $width ?>px; height:<?= floor($line['height']) ?>px">
 	<?php foreach($line['photos'] as &$photo) :
-	?><span class="afg-photo"><img style="height:<?= floor($line['height']) ?>px; margin-right: <?= $photo['margin_z'] ?>px" src="<?= $photo['url_z'] ?>" id="<?= $photo['id'] ?>" alt="<?= $this->_get_photo_big_url($photo) ?>"/></span><?php
+	?><span class="afg-photo"><img style="width: <?= $photo['width_z'] ?>px; height:<?= $line['height'] ?>px; margin-right: <?= $photo['margin_z'] ?>px" src="<?= $photo['url_z'] ?>" id="<?= $photo['id'] ?>" alt="<?= $this->_get_photo_big_url($photo) ?>"/></span><?php
 	endforeach; ?>
 </div>
 <?php endforeach; ?>
